@@ -10,6 +10,8 @@ import cv2
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
+
+# Adding flags for script
 tf.app.flags.DEFINE_string('server', 'localhost:9000',
                            'PredictionService host:port')
 tf.app.flags.DEFINE_string('input_image', '', 'path to image in JPEG format')
@@ -36,12 +38,8 @@ request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto(img, shape=[
 # Call the prediction server
 result = stub.Predict(request, 180.0)  # 10 secs timeout
 
-print(result)
-
 # Plot boxes on the input image
-#category_index = lmu.load_labelmap(FLAGS.path_to_labels)
-category_index2 = lmu.create_category_index_from_labelmap(FLAGS.path_to_labels, False)
-#print(category_index2.Keys())
+category_index = lmu.create_category_index_from_labelmap(FLAGS.path_to_labels, False)
 boxes = result.outputs['detection_boxes'].float_val
 classes = result.outputs['detection_classes'].float_val
 scores = result.outputs['detection_scores'].float_val
@@ -55,6 +53,5 @@ image_vis = vis_util.visualize_boxes_and_labels_on_image_array(
     line_thickness=5)
 
 # Save inference to disk
-
 scipy.misc.imsave('%s.jpg'%(FLAGS.input_image), image_vis)
 
