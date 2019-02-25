@@ -8,7 +8,6 @@ import numpy as np
 import scipy
 import tensorflow as tf
 from pascal_voc_writer import Writer
-#import cv2
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
@@ -20,6 +19,7 @@ tf.app.flags.DEFINE_string('input_image', '', 'path to image in JPEG format')
 tf.app.flags.DEFINE_string('path_to_labels', '', 'path to labels')
 FLAGS = tf.app.flags.FLAGS
 
+# Minimum treshold of certainty for boxes to be included, in percentage.
 min_score_tresh = 0.5
 
 # Create stub
@@ -60,41 +60,39 @@ for image in images:
     classes = result.outputs['detection_classes'].float_val
     scores = result.outputs['detection_scores'].float_val
 
+    # Format output properly before converting to Pascal VOC
     boxes = np.reshape(boxes,[100,4])
     classes = np.squeeze(classes).astype(np.int32)
     scores = np.squeeze(scores)
 
-
+    # Iterate through each box predicted by the served model
     for i in range(boxes.shape[0]):
+        # Discard any boxas under 50% certainty
         if scores[i] > min_score_tresh:
+
+            # Format box output
             box = tuple(boxes[i].tolist())
 
+            # Fetch "class_name", also known as label.
             if classes[i] in category_index.keys():
                 class_name = category_index[classes[i]]['name']
             else:
                 class_name = 'N/A'
 
+            # Fetch x and y positions of box-corners in percentage.
             ymin_percent, xmin_percent, ymax_percent, xmax_percent = box
 
+            # Calculate the pixel the box corners are positioned at.
             ymin = ymin_percent * height
             ymax = ymax_percent * height
-
             xmin = xmin_percent * width
             xmax = xmax_percent * width
 
+            # Add output to Pascal VOC object.
             writer.addObject(class_name, xmin, ymin, xmax, ymax)
 
+    # Define the XML path of the new Pascal VOC file.
     xml_path = image.rstrip('.jpg') + '.xml'
+    # Save the XML in Pascal VOC format.
     writer.save(xml_path)
 
-            
-
-    #image_vis = vis_util.visualize_boxes_and_labels_on_image_array(
-    #    img,
-    #    np.reshape(boxes,[100,4]),
-    #    np.squeeze(classes).astype(np.int32),
-    #    np.squeeze(scores),
-    #    category_index,
-    #    use_normalized_coordinates=True,
-    #    line_thickness=4)
-    
