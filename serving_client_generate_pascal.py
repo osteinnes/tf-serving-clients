@@ -7,6 +7,7 @@ import glob
 import numpy as np
 import scipy
 import tensorflow as tf
+from pascal_voc_writer import Writer
 #import cv2
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
@@ -36,9 +37,17 @@ request.model_spec.name = 'model_test'
 # Specify signature name (should be the same as specified when exporting model)
 request.model_spec.signature_name = ""
 
+
 images = glob.glob(FLAGS.input_image + "/*.jpg")
 for image in images:
+    # Reading image from given path
     img = scipy.misc.imread(image)
+    # Reading the resolution of said image.
+    height, width, channels = img.shape
+
+    # Create Pascal VOC writer.
+    writer = Writer(image, width, height)
+
     request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto(img, shape=[1] + list(img.shape)))
 
     # Call the prediction server
@@ -65,14 +74,18 @@ for image in images:
             else:
                 class_name = 'N/A'
 
-            ymin, xmin, ymax, xmax = box
+            ymin_percent, xmin_percent, ymax_percent, xmax_percent = box
 
-            print("Name: " + class_name)
-            print("ymin: " + str(ymin))
-            print("ymax: " + str(ymax))
-            print("xmin: " + str(xmin))
-            print("xmax: " + str(xmax))
-            print("score: " + str(scores[i]))
+            ymin = ymin_percent * height
+            ymax = ymax_percent * height
+
+            xmin = xmin_percent * width
+            xmax = xmax_percent * width
+
+            writer.addObject(class_name, xmin, ymin, xmax, ymax)
+
+    xml_path = image.rstrip('.jpg') + '.xml'
+    writer.save(xml_path)
 
             
 
