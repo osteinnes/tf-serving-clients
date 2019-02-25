@@ -83,10 +83,10 @@ for image in images:
             ymin_percent, xmin_percent, ymax_percent, xmax_percent = box
 
             # Calculate the pixel the box corners are positioned at.
-            ymin = ymin_percent * height
-            ymax = ymax_percent * height
-            xmin = xmin_percent * width
-            xmax = xmax_percent * width
+            ymin = int(ymin_percent * height)
+            ymax = int(ymax_percent * height)
+            xmin = int(xmin_percent * width)
+            xmax = int(xmax_percent * width)
 
             # Add output to Pascal VOC object.
             writer.addObject(class_name, xmin, ymin, xmax, ymax)
