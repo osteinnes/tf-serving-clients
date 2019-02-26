@@ -20,6 +20,7 @@ def main():
     tf.app.flags.DEFINE_string(
         'input_image', '', 'path to image in JPEG format')
     tf.app.flags.DEFINE_string('path_to_labels', '', 'path to labels')
+    tf.app.flags.DEFINE_string('debug', 'False', 'Debug status')
     FLAGS = tf.app.flags.FLAGS
 
     # Minimum treshold of certainty for boxes to be included, in percentage.
@@ -50,7 +51,6 @@ def main():
 
         # Reading image from given path
         img = scipy.misc.imread(image)
-        print_img = cv2.imread(image)
         # Reading the resolution of said image.
         height, width, channels = img.shape
 
@@ -81,6 +81,11 @@ def main():
             # Discard any boxas under 50% certainty
             if pred_scores[i] > min_score_tresh:
 
+                if FLAGS.debug:
+                    print_img = cv2.imread(image)
+                    gt = []
+                    print_img_array = []
+
                 # Format box output
                 pred_box = tuple(pred_boxes[i].tolist())
 
@@ -102,33 +107,45 @@ def main():
                 pred = [pred_xmin, pred_ymin, pred_xmax, pred_ymax]
 
                 # load the image
-                print("Number of runs to find matching boxes: ", i)
-
-                gt = []
-                print_img_array = []
+                print("Predicted box number ", i, " Predicted class: " , pred_class_name)
 
                 for k in range(len(annotation_boxes)):
+                    
                     # draw the ground-truth bounding box along with the predicted
                     # bounding box
-                    gt.append(annotation_boxes[k])
+                    if FLAGS.debug:
+                        
+                        # Add current label.
+                        gt.append(annotation_boxes[k])
+                        # Add current image.
+                        print_img_array.append(print_img)
 
-                    print_img_array.append(print_img)
+                        # Draw rectangle on image.
+                        cv2.rectangle(print_img_array[k], tuple(gt[k][:2]),
+                                    tuple(gt[k][2:]), (0, 255, 0), 2)
+                        cv2.rectangle(print_img_array[k], tuple(pred[:2]),
+                                    tuple(pred[2:]), (0, 0, 255), 2)
 
-                    cv2.rectangle(print_img_array[k], tuple(gt[k][:2]),
-                                  tuple(gt[k][2:]), (0, 255, 0), 2)
-                    cv2.rectangle(print_img_array[k], tuple(pred[:2]),
-                                  tuple(pred[2:]), (0, 0, 255), 2)
+                        # Show image.
+                        cv2.imshow("Image " + str(k), print_img_array[k])
 
-                    cv2.imshow("Image " + str(k), print_img_array[k])
-
+                    # Calculate IOU result.
                     iou_result = bb_intersection_over_union(
                         pred, annotation_boxes[k])
-                    if iou_result > 0.1:
-                        #if pred_class_name == annotation_names[i]:
-                        print(iou_result)
 
-                    cv2.waitKey(10000)
-                    cv2.destroyAllWindows()
+                    # Checks if IOU is above 40%
+                    if iou_result > 0.4:
+                        print(iou_result)
+                        if pred_class_name == annotation_names[k]:
+                            print("Class is correct: ", annotation_names[k])
+                        else:
+                            print("Class is incorrect: ", annotation_names[k])
+                        
+
+                    if FLAGS.debug:
+                        # Wait, and destroy.
+                        cv2.waitKey(10000)
+                        cv2.destroyAllWindows()
 
 
 def read_pascal_voc(xml_file: str):
@@ -151,18 +168,21 @@ def read_pascal_voc(xml_file: str):
         ymin, xmin, ymax, xmax = None, None, None, None
         name = None
 
+        # Class name of the label in labels.
         name = str(boxes.find("name").text)
-
+        # List of label names.
         list_with_all_names.append(name)
 
+        # Iterate through bndbox to find limits of box.
         for box in boxes.findall("bndbox"):
-
             ymin = int(box.find("ymin").text)
             xmin = int(box.find("xmin").text)
             ymax = int(box.find("ymax").text)
             xmax = int(box.find("xmax").text)
 
+            # Represent a single box's boundaries
             list_with_single_boxes = [xmin, ymin, xmax, ymax]
+            # List of boxes.
             list_with_all_boxes.append(list_with_single_boxes)
 
     return list_with_all_names, list_with_all_boxes
