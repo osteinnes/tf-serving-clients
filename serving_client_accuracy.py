@@ -127,6 +127,3 @@ def read_pascal_voc(xml_file: str):
 
 if __name__ == '__main__':
     main()
-
-    # Define the XML path of the new Pascal VOC file.
-    # xml_path = image.rstrip('.jpg') + '.xml'
