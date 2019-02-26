@@ -86,32 +86,43 @@ def main():
                 pred_xmin = int(pred_xmin_percent * width)
                 pred_xmax = int(pred_xmax_percent * width)
 
-                print('mainrun')
+                xml_path = image.rstrip('.jpg') + '.xml'
+                
+                annotation_names, annotation_boxes = read_pascal_voc(xml_path)
+
+                #for annotation_boxes[i] in annotation_boxes:
 
 
-def read_content(xml_file: str):
+def read_pascal_voc(xml_file: str):
 
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
     list_with_all_boxes = []
+    list_with_all_names = []
 
     for boxes in root.iter('object'):
 
         filename = root.find('filename').text
 
         ymin, xmin, ymax, xmax = None, None, None, None
+        name = None
+
+        name = str(boxes.find("name").text)
+
+        list_with_all_names.append(name)
 
         for box in boxes.findall("bndbox"):
+
             ymin = int(box.find("ymin").text)
             xmin = int(box.find("xmin").text)
             ymax = int(box.find("ymax").text)
             xmax = int(box.find("xmax").text)
 
-        list_with_single_boxes = [xmin, ymin, xmax, ymax]
-        list_with_all_boxes.append(list_with_single_boxes)
+            list_with_single_boxes = [xmin, ymin, xmax, ymax]
+            list_with_all_boxes.append(list_with_single_boxes)
 
-    return filename, list_with_all_boxes
+    return list_with_all_names, list_with_all_boxes
 
 
 if __name__ == '__main__':
