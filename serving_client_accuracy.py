@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import glob
 import numpy as np
 import scipy
+import cv2
 import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
@@ -15,8 +16,9 @@ from tensorflow_serving.apis import prediction_service_pb2
 def main():
     # Adding flags for script
     tf.app.flags.DEFINE_string('server', 'localhost:9000',
-                            'PredictionService host:port')
-    tf.app.flags.DEFINE_string('input_image', '', 'path to image in JPEG format')
+                               'PredictionService host:port')
+    tf.app.flags.DEFINE_string(
+        'input_image', '', 'path to image in JPEG format')
     tf.app.flags.DEFINE_string('path_to_labels', '', 'path to labels')
     FLAGS = tf.app.flags.FLAGS
 
@@ -34,34 +36,45 @@ def main():
     # Specify model name (must be the same as when the TensorFlow serving serving was started)
     request.model_spec.name = 'model_test'
 
-    # Initalize prediction 
+    # Initalize prediction
     # Specify signature name (should be the same as specified when exporting model)
     request.model_spec.signature_name = ""
 
-
     images = glob.glob(FLAGS.input_image + "/*.jpg")
     for image in images:
+
+        print()
+        print()
+        print("Results for image: " + image)
+        print()
+
         # Reading image from given path
         img = scipy.misc.imread(image)
+        print_img = cv2.imread(image)
         # Reading the resolution of said image.
         height, width, channels = img.shape
 
-        request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto(img, shape=[1] + list(img.shape)))
+        request.inputs['inputs'].CopyFrom(
+            tf.contrib.util.make_tensor_proto(img, shape=[1] + list(img.shape)))
 
         # Call the prediction server
         result = stub.Predict(request, 180.0)  # 10 secs timeout
 
-
         # Plot boxes on the input image
-        pred_category_index = lmu.create_category_index_from_labelmap(FLAGS.path_to_labels, False)
+        pred_category_index = lmu.create_category_index_from_labelmap(
+            FLAGS.path_to_labels, False)
         pred_boxes = result.outputs['detection_boxes'].float_val
         pred_classes = result.outputs['detection_classes'].float_val
         pred_scores = result.outputs['detection_scores'].float_val
 
         # Format output properly before converting to Pascal VOC
-        pred_boxes = np.reshape(pred_boxes,[100,4])
+        pred_boxes = np.reshape(pred_boxes, [100, 4])
         pred_classes = np.squeeze(pred_classes).astype(np.int32)
         pred_scores = np.squeeze(pred_scores)
+
+        xml_path = image.rstrip('.jpg') + '.xml'
+
+        annotation_names, annotation_boxes = read_pascal_voc(xml_path)
 
         # Iterate through each box predicted by the served model
         for i in range(pred_boxes.shape[0]):
@@ -86,17 +99,36 @@ def main():
                 pred_xmin = int(pred_xmin_percent * width)
                 pred_xmax = int(pred_xmax_percent * width)
 
-                xml_path = image.rstrip('.jpg') + '.xml'
-                
-                annotation_names, annotation_boxes = read_pascal_voc(xml_path)
+                pred = [pred_xmin, pred_ymin, pred_xmax, pred_ymax]
 
-                print("Number of runs to find matching boxes: " , i)
+                # load the image
+                print("Number of runs to find matching boxes: ", i)
 
-                for annotation_boxes[i] in annotation_boxes:
-                    iou_result = bb_intersection_over_union([pred_xmin, pred_ymin, pred_xmax, pred_ymax], annotation_boxes[i])
+                gt = []
+                print_img_array = []
+
+                for k in range(len(annotation_boxes)):
+                    # draw the ground-truth bounding box along with the predicted
+                    # bounding box
+                    gt.append(annotation_boxes[k])
+
+                    print_img_array.append(print_img)
+
+                    cv2.rectangle(print_img_array[k], tuple(gt[k][:2]),
+                                  tuple(gt[k][2:]), (0, 255, 0), 2)
+                    cv2.rectangle(print_img_array[k], tuple(pred[:2]),
+                                  tuple(pred[2:]), (0, 0, 255), 2)
+
+                    cv2.imshow("Image " + str(k), print_img_array[k])
+
+                    iou_result = bb_intersection_over_union(
+                        pred, annotation_boxes[k])
                     if iou_result > 0.1:
-                        if pred_class_name == annotation_names[i]:
-                            print(iou_result)
+                        #if pred_class_name == annotation_names[i]:
+                        print(iou_result)
+
+                    cv2.waitKey(10000)
+                    cv2.destroyAllWindows()
 
 
 def read_pascal_voc(xml_file: str):
@@ -118,7 +150,6 @@ def read_pascal_voc(xml_file: str):
         # Define None values.
         ymin, xmin, ymax, xmax = None, None, None, None
         name = None
-
 
         name = str(boxes.find("name").text)
 
@@ -143,20 +174,20 @@ def bb_intersection_over_union(boxA, boxB):
 	yA = max(boxA[1], boxB[1])
 	xB = min(boxA[2], boxB[2])
 	yB = min(boxA[3], boxB[3])
- 
+
 	# compute the area of intersection rectangle
 	interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
- 
+
 	# compute the area of both the prediction and ground-truth
 	# rectangles
 	boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
 	boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
- 
+
 	# compute the intersection over union by taking the intersection
 	# area and dividing it by the sum of prediction + ground-truth
 	# areas - the interesection area
 	iou = interArea / float(boxAArea + boxBArea - interArea)
- 
+
 	# return the intersection over union value
 	return iou
 
