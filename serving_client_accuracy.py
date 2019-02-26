@@ -90,23 +90,35 @@ def main():
                 
                 annotation_names, annotation_boxes = read_pascal_voc(xml_path)
 
-                #for annotation_boxes[i] in annotation_boxes:
+                print("Number of runs to find matching boxes: " , i)
+
+                for annotation_boxes[i] in annotation_boxes:
+                    iou_result = bb_intersection_over_union([pred_xmin, pred_ymin, pred_xmax, pred_ymax], annotation_boxes[i])
+                    if iou_result > 0.1:
+                        if pred_class_name == annotation_names[i]:
+                            print(iou_result)
 
 
 def read_pascal_voc(xml_file: str):
 
+    # Retrieve XML-file with element tree
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
+    # Initiate empty vectors
     list_with_all_boxes = []
     list_with_all_names = []
 
+    # Iterate through each object in the Pascal VOC xml.
     for boxes in root.iter('object'):
 
+        # Retrieve filename
         filename = root.find('filename').text
 
+        # Define None values.
         ymin, xmin, ymax, xmax = None, None, None, None
         name = None
+
 
         name = str(boxes.find("name").text)
 
@@ -123,6 +135,30 @@ def read_pascal_voc(xml_file: str):
             list_with_all_boxes.append(list_with_single_boxes)
 
     return list_with_all_names, list_with_all_boxes
+
+
+def bb_intersection_over_union(boxA, boxB):
+	# determine the (x, y)-coordinates of the intersection rectangle
+	xA = max(boxA[0], boxB[0])
+	yA = max(boxA[1], boxB[1])
+	xB = min(boxA[2], boxB[2])
+	yB = min(boxA[3], boxB[3])
+ 
+	# compute the area of intersection rectangle
+	interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
+ 
+	# compute the area of both the prediction and ground-truth
+	# rectangles
+	boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
+	boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
+ 
+	# compute the intersection over union by taking the intersection
+	# area and dividing it by the sum of prediction + ground-truth
+	# areas - the interesection area
+	iou = interArea / float(boxAArea + boxBArea - interArea)
+ 
+	# return the intersection over union value
+	return iou
 
 
 if __name__ == '__main__':
