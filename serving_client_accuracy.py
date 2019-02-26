@@ -11,6 +11,7 @@ import cv2
 import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
+from tools.iou_xml import Writer
 
 
 def main():
@@ -25,6 +26,8 @@ def main():
 
     # Minimum treshold of certainty for boxes to be included, in percentage.
     min_score_tresh = 0.5
+
+    writer = Writer(FLAGS.input_image)
 
     # Create stub
     host, port = FLAGS.server.split(':')
@@ -48,6 +51,8 @@ def main():
         print()
         print("Results for image: " + image)
         print()
+
+        ious = []
 
         # Reading image from given path
         img = scipy.misc.imread(image)
@@ -136,6 +141,9 @@ def main():
                     # Checks if IOU is above 40%
                     if iou_result > 0.4:
                         print(iou_result)
+
+                        ious.append(iou_result)
+
                         if pred_class_name == annotation_names[k]:
                             print("Class is correct: ", annotation_names[k])
                         else:
@@ -146,6 +154,10 @@ def main():
                         # Wait, and destroy.
                         cv2.waitKey(10000)
                         cv2.destroyAllWindows()
+
+        writer.addObject(image, 2, 2, ious) 
+
+    writer.save("/home/osteinnes/prog/tfserving-client/test.xml")                 
 
 
 def read_pascal_voc(xml_file: str):
