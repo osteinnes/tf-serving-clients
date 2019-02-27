@@ -1,5 +1,7 @@
 
 import xml.etree.ElementTree as ET
+import numpy as np
+from scipy import stats
 
 
 def main():
@@ -11,12 +13,32 @@ def main():
         xml_path)
 
     # Print output as test.
-    print(list_with_all_label_cracks)
-    print(list_with_all_pred_cracks)
-    print(list_with_iou)
-    print(list_with_certainty)
-    print(list_with_actu_class)
-    print(list_with_pred_class)
+    #print(list_with_all_label_cracks)
+    #print(list_with_all_pred_cracks)
+    #print(list_with_iou)
+    #print(list_with_certainty)
+    #print(list_with_actu_class)
+    #print(list_with_pred_class)
+
+    total_pred_cracks = sum(list_with_all_pred_cracks)
+    total_actu_cracks = sum(list_with_all_label_cracks)
+
+    print()
+    print("Total number of predicted cracks: ", total_pred_cracks)
+    print("Total number of labeled cracks: ", total_actu_cracks)
+
+    averages = sum(list_with_iou, 0.0) / len(list_with_iou)
+
+    mean = np.mean(list_with_iou)
+
+    describe = stats.describe(list_with_iou)
+
+    print()
+    print("Average of IOU: ", averages)
+    print("Mean of IOU: ", mean)
+    print(describe)
+
+
     
 
 
