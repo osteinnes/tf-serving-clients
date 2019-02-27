@@ -86,6 +86,8 @@ def main():
 
         annotation_names, annotation_boxes = read_pascal_voc(xml_path)
 
+        cert_scores = []
+
         # Iterate through each box predicted by the served model
         for i in range(pred_boxes.shape[0]):
             # Discard any boxas under 50% certainty
@@ -95,6 +97,9 @@ def main():
                     print_img = cv2.imread(image)
                     gt = []
                     print_img_array = []
+
+                cert_scores = []
+                cert_scores.append(pred_scores[i])
 
                 # Format box output
                 pred_box = tuple(pred_boxes[i].tolist())
@@ -160,7 +165,7 @@ def main():
                         cv2.waitKey(10000)
                         cv2.destroyAllWindows()
 
-        writer.addObject(image, 2, 2, ious) 
+        writer.addObject(image, 2, 2, ious, cert_scores) 
 
     writer.save("/home/osteinnes/prog/tfserving-client/test.xml")                 
 
