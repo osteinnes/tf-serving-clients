@@ -1,0 +1,197 @@
+<annotation>
+    <folder>osteinnes</folder>
+    <path>/home/osteinnes/testpascal</path>
+    <object>
+        <filename>Fy20_Fv885_hp03_f1_m13371.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m10966.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m12446.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f1_m12171.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m12406.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f1_m12211.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m09506.jpg</filename>
+        <data>
+            <num_label_cracks>2</num_label_cracks>
+            <num_pred_cracks>1</num_pred_cracks>
+            
+            <crack>
+                <number>
+                0
+                </number>
+                <iou>
+                0.8911554392193439
+                </iou>
+                <certainty>
+                0.9992293119430542
+                </certainty>
+                <pred_class>
+                horizontal_crack
+                </pred_class>
+                <actu_class>
+                horizontal_crack
+                </actu_class>
+            </crack>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f1_m13641.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m09546.jpg</filename>
+        <data>
+            <num_label_cracks>2</num_label_cracks>
+            <num_pred_cracks>2</num_pred_cracks>
+            
+            <crack>
+                <number>
+                0
+                </number>
+                <iou>
+                0.9185567010309278
+                </iou>
+                <certainty>
+                0.9999845027923584
+                </certainty>
+                <pred_class>
+                vertical_crack_1
+                </pred_class>
+                <actu_class>
+                vertical_crack_1
+                </actu_class>
+            </crack>
+            
+            <crack>
+                <number>
+                1
+                </number>
+                <iou>
+                0.9141827917731532
+                </iou>
+                <certainty>
+                0.9997491240501404
+                </certainty>
+                <pred_class>
+                vertical_crack_1
+                </pred_class>
+                <actu_class>
+                vertical_crack_1
+                </actu_class>
+            </crack>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m08306.jpg</filename>
+        <data>
+            <num_label_cracks>1</num_label_cracks>
+            <num_pred_cracks>1</num_pred_cracks>
+            
+            <crack>
+                <number>
+                0
+                </number>
+                <iou>
+                0.9711886030193494
+                </iou>
+                <certainty>
+                0.998579740524292
+                </certainty>
+                <pred_class>
+                horizontal_crack
+                </pred_class>
+                <actu_class>
+                horizontal_crack
+                </actu_class>
+            </crack>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m08196.jpg</filename>
+        <data>
+            <num_label_cracks>2</num_label_cracks>
+            <num_pred_cracks>2</num_pred_cracks>
+            
+            <crack>
+                <number>
+                0
+                </number>
+                <iou>
+                0.859658208182289
+                </iou>
+                <certainty>
+                0.9999713897705078
+                </certainty>
+                <pred_class>
+                vertical_crack_1
+                </pred_class>
+                <actu_class>
+                vertical_crack_1
+                </actu_class>
+            </crack>
+            
+            <crack>
+                <number>
+                1
+                </number>
+                <iou>
+                0.898170602500412
+                </iou>
+                <certainty>
+                0.998630166053772
+                </certainty>
+                <pred_class>
+                horizontal_crack
+                </pred_class>
+                <actu_class>
+                horizontal_crack
+                </actu_class>
+            </crack>
+            
+        </data>
+    </object>    <object>
+        <filename>Fy20_Fv885_hp03_f2_m11366.jpg</filename>
+        <data>
+            <num_label_cracks>0</num_label_cracks>
+            <num_pred_cracks>0</num_pred_cracks>
+            
+        </data>
+    </object>
+</annotation>

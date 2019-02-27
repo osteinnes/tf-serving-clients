@@ -6,20 +6,25 @@
         <data>
             <num_label_cracks>{{ object.num_label_cracks }}</num_label_cracks>
             <num_pred_cracks>{{ object.num_pred_cracks }}</num_pred_cracks>
-                       
-                <result>
-                    {% for iou in object.ious %} 
-                    <iou_score>
-                    {{ iou }}
-                    </iou_score>
-                    {% endfor %}
-                    {% for certainty in object.certainties %} 
-                    <certainty>
-                    {{ certainty }}
-                    </certainty>
-                    {% endfor %}
-                    
-                </result>
+            {% for crack in object.cracks %}
+            <crack>
+                <number>
+                {{ crack[0] }}
+                </number>
+                <iou>
+                {{ crack[1] }}
+                </iou>
+                <certainty>
+                {{ crack[2] }}
+                </certainty>
+                <pred_class>
+                {{ crack[3] }}
+                </pred_class>
+                <actu_class>
+                {{ crack[4] }}
+                </actu_class>
+            </crack>
+            {% endfor %}
         </data>
     </object>{% endfor %}
 </annotation>

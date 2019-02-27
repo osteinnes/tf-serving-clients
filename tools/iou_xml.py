@@ -15,7 +15,7 @@ class Writer:
             'objects': []
         }
 
-    def addObject(self, path, num_label_cracks, num_pred_cracks, ious, certanties):
+    def addObject(self, path, num_label_cracks, num_pred_cracks, cracks):
 
         abspath = os.path.abspath(path)
 
@@ -23,9 +23,10 @@ class Writer:
             'filename': os.path.basename(abspath),
             'num_label_cracks': num_label_cracks,
             'num_pred_cracks': num_pred_cracks,
-            'ious': ious,
-            'certainties': certanties
+            'cracks': cracks
         })
+
+        print(cracks)
 
     def addScore(self, iou, i):
         self.template_parameters['objects'].append({

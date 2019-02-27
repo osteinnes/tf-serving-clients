@@ -58,6 +58,7 @@ def main():
         print()
 
         ious = []
+        iou_tester = 0
 
         # Reading image from given path
         img = scipy.misc.imread(image)
@@ -91,6 +92,10 @@ def main():
         num_label_boxes = 0
         num_pred_boxes = 0
 
+        cracks = []
+
+        actu_class = 'N/A'
+
         # Iterate through each box predicted by the served model
         for i in range(pred_boxes.shape[0]):
             # Discard any boxas under 50% certainty
@@ -101,10 +106,18 @@ def main():
                     gt = []
                     print_img_array = []
 
+                
+
                 cert_scores = []
                 cert_scores.append(pred_scores[i])
 
-                num_pred_boxes =+ 1
+                iou_prelim = 0
+                iou_result = 0
+
+                certainty = 0
+                certainty = pred_scores[i]
+
+                num_pred_boxes = i+1
 
                 # Format box output
                 pred_box = tuple(pred_boxes[i].tolist())
@@ -127,16 +140,18 @@ def main():
                 pred = [pred_xmin, pred_ymin, pred_xmax, pred_ymax]
 
                 # load the image
-                print("Predicted box number ", i, " Predicted class: " , pred_class_name)
+                print("Predicted box number ", i,
+                      " Predicted class: ", pred_class_name)
 
                 num_label_boxes = len(annotation_boxes)
 
+                k = 0
                 for k in range(len(annotation_boxes)):
-                    
+
                     # draw the ground-truth bounding box along with the predicted
                     # bounding box
                     if DEBUG:
-                        
+
                         # Add current label.
                         gt.append(annotation_boxes[k])
                         # Add current image.
@@ -144,37 +159,55 @@ def main():
 
                         # Draw rectangle on image.
                         cv2.rectangle(print_img_array[k], tuple(gt[k][:2]),
-                                    tuple(gt[k][2:]), (0, 255, 0), 2)
+                                      tuple(gt[k][2:]), (0, 255, 0), 2)
                         cv2.rectangle(print_img_array[k], tuple(pred[:2]),
-                                    tuple(pred[2:]), (0, 0, 255), 2)
+                                      tuple(pred[2:]), (0, 0, 255), 2)
 
                         # Show image.
                         cv2.imshow("Image " + str(k), print_img_array[k])
 
                     # Calculate IOU result.
-                    iou_result = bb_intersection_over_union(
+                    iou_prelim = bb_intersection_over_union(
                         pred, annotation_boxes[k])
 
                     # Checks if IOU is above 40%
-                    if iou_result > 0.4:
-                        print(iou_result)
+                    if iou_prelim > 0.4:
+                        print(iou_prelim)
 
-                        ious.append(iou_result)
+                        actu_class = annotation_names[k]
 
                         if pred_class_name == annotation_names[k]:
                             print("Class is correct: ", annotation_names[k])
                         else:
                             print("Class is incorrect: ", annotation_names[k])
+
+                        if iou_prelim > iou_result:
+                            iou_result = iou_prelim
                         
+                        print()
+                        print(iou_result)
+
 
                     if DEBUG:
                         # Wait, and destroy.
                         cv2.waitKey(10000)
                         cv2.destroyAllWindows()
 
-        writer.addObject(image, num_label_boxes, num_pred_boxes, ious, cert_scores) 
+                cracks.append([i, iou_result,
+                               certainty,
+                               pred_class_name,
+                               actu_class])
 
-    writer.save("/home/osteinnes/prog/tfserving-client/test.xml")                 
+                iou_result = 0
+                iou_tester = 0
+                iou_prelim = 0
+
+        writer.addObject(image,
+                         num_label_boxes,
+                         num_pred_boxes,
+                         cracks)
+
+    writer.save("/home/osteinnes/prog/tfserving-client/output/example_output.xml")
 
 
 def read_pascal_voc(xml_file: str):
