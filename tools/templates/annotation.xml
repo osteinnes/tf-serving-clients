@@ -6,7 +6,11 @@
         <data>
             <num_label_cracks>{{ object.num_label_cracks }}</num_label_cracks>
             <num_pred_cracks>{{ object.num_pred_cracks }}</num_pred_cracks>
-            <score>{{ objects.score }}</score>
+            {% for iou in object.ious %}            
+                <iou>
+                {{ iou }}
+                </iou>
+            {% endfor %}
         </data>
     </object>{% endfor %}
 </annotation>

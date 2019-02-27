@@ -19,14 +19,29 @@ class Writer:
 
         abspath = os.path.abspath(path)
 
+        #for index, item in enumerate(ious):
+        #    self.template_parameters['ious'].append({
+        #    'iou_score': item
+        #    })
+
+        
+
         self.template_parameters['objects'].append({
             'filename': os.path.basename(abspath),
             'num_label_cracks': num_label_cracks,
             'num_pred_cracks': num_pred_cracks,
-            'score': ious
+            'ious': ious
         })
 
-        print("ious: ", ious)
+        #for index, item in enumerate(ious):
+        #    self.addScore(item, index)
+
+    def addScore(self, iou, i):
+        self.template_parameters['objects'].append({
+            'iou_score': iou
+        })
+
+        print("IOU-score: ", iou)
 
     def save(self, annotation_path):
         with open(annotation_path, 'w') as file:
