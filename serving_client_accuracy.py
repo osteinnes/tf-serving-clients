@@ -88,6 +88,9 @@ def main():
 
         cert_scores = []
 
+        num_label_boxes = 0
+        num_pred_boxes = 0
+
         # Iterate through each box predicted by the served model
         for i in range(pred_boxes.shape[0]):
             # Discard any boxas under 50% certainty
@@ -100,6 +103,8 @@ def main():
 
                 cert_scores = []
                 cert_scores.append(pred_scores[i])
+
+                num_pred_boxes =+ 1
 
                 # Format box output
                 pred_box = tuple(pred_boxes[i].tolist())
@@ -123,6 +128,8 @@ def main():
 
                 # load the image
                 print("Predicted box number ", i, " Predicted class: " , pred_class_name)
+
+                num_label_boxes = len(annotation_boxes)
 
                 for k in range(len(annotation_boxes)):
                     
@@ -165,7 +172,7 @@ def main():
                         cv2.waitKey(10000)
                         cv2.destroyAllWindows()
 
-        writer.addObject(image, 2, 2, ious, cert_scores) 
+        writer.addObject(image, num_label_boxes, num_pred_boxes, ious, cert_scores) 
 
     writer.save("/home/osteinnes/prog/tfserving-client/test.xml")                 
 
