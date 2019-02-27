@@ -21,8 +21,13 @@ def main():
     tf.app.flags.DEFINE_string(
         'input_image', '', 'path to image in JPEG format')
     tf.app.flags.DEFINE_string('path_to_labels', '', 'path to labels')
-    tf.app.flags.DEFINE_string('debug', 'False', 'Debug status')
+    tf.app.flags.DEFINE_string('debug', 'no', 'Debug status')
     FLAGS = tf.app.flags.FLAGS
+
+    if FLAGS.debug == 'yes':
+        DEBUG = True
+    else:
+        DEBUG = False
 
     # Minimum treshold of certainty for boxes to be included, in percentage.
     min_score_tresh = 0.5
@@ -86,7 +91,7 @@ def main():
             # Discard any boxas under 50% certainty
             if pred_scores[i] > min_score_tresh:
 
-                if FLAGS.debug:
+                if DEBUG:
                     print_img = cv2.imread(image)
                     gt = []
                     print_img_array = []
@@ -118,7 +123,7 @@ def main():
                     
                     # draw the ground-truth bounding box along with the predicted
                     # bounding box
-                    if FLAGS.debug:
+                    if DEBUG:
                         
                         # Add current label.
                         gt.append(annotation_boxes[k])
@@ -150,7 +155,7 @@ def main():
                             print("Class is incorrect: ", annotation_names[k])
                         
 
-                    if FLAGS.debug:
+                    if DEBUG:
                         # Wait, and destroy.
                         cv2.waitKey(10000)
                         cv2.destroyAllWindows()
