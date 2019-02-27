@@ -61,7 +61,7 @@ def read_iou_xml(xml_file: str):
             iou = float(crack.find("iou").text)
             certainty = float(crack.find("certainty").text)
             pred_class = str(crack.find("pred_class").text)
-            xmax = str(crack.find("actu_class").text)
+            actu_class = str(crack.find("actu_class").text)
 
             list_with_iou.append(iou)
             list_with_certainty.append(certainty)
