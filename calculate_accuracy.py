@@ -1,31 +1,32 @@
-
 import xml.etree.ElementTree as ET
 import numpy as np
 from scipy import stats
-from scipy.stats import expon
 
 class Accuracy_Calc:
 
 
     def __init__(self, xml_path, output_filename):
 
-        # Path of xml.
-        # xml_path = "/home/osteinnes/prog/tfserving-client/output/example_output.xml"
-
+        # Retrieving data from IOU xml.
         list_with_all_label_cracks, list_with_all_pred_cracks, list_with_iou, list_with_certainty, list_with_pred_class, list_with_actu_class = self.read_iou_xml(
             xml_path)
 
+        # Create file for output.
         output_file = open(output_filename, "w+")
 
+        # Do some necessary calculations for data representation
         total_pred_cracks = sum(list_with_all_pred_cracks)
         total_actu_cracks = sum(list_with_all_label_cracks)
-
         total_missed_cracks = total_actu_cracks - total_pred_cracks
-
         if total_missed_cracks > 0:
             for i in range(total_missed_cracks):
                 list_with_iou.append(0)
 
+        # Find statistics
+        describe = stats.describe(list_with_iou)
+        nobs, minmax, mean, variance, skewness, kurtosis = describe
+
+        # Write output
         output_file.write("ACCURACY OF OBJECT DETECTION MODEL \n")
         output_file.write("----------------------------------------------------------\n")
         output_file.write("Path of XML: " + xml_path + "\n")
@@ -34,9 +35,6 @@ class Accuracy_Calc:
         output_file.write("Total number of labeled cracks: " + str(total_actu_cracks) + "\n")
         output_file.write("Total number of missed cracks: " + str(total_missed_cracks) + "\n")
         output_file.write("----------------------------------------------------------\n")
-
-        describe = stats.describe(list_with_iou)
-        nobs, minmax, mean, variance, skewness, kurtosis = describe
 
         output_file.write("See scipy.describe for documentation\n")
         output_file.write("----------------------------------------------------------\n")
@@ -85,7 +83,7 @@ class Accuracy_Calc:
             list_with_all_label_cracks.append(num_label_cracks)
             list_with_all_pred_cracks.append(num_pred_cracks)
 
-            # Iterate through bndbox to find limits of box.
+            # Iterate through crack to find values for each image.
             for crack in images.find("data").findall("crack"):
                 iou = float(crack.find("iou").text)
                 certainty = float(crack.find("certainty").text)

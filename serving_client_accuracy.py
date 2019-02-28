@@ -207,7 +207,7 @@ def main():
                          num_pred_boxes,
                          cracks)
 
-    writer.save("/home/osteinnes/prog/tfserving-client/output/example_output.xml")
+    writer.save("/home/osteinnes/prog/tfserving-client/output/validation_acc_output.xml")
 
 
 def read_pascal_voc(xml_file: str):
