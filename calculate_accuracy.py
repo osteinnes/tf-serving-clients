@@ -2,96 +2,103 @@
 import xml.etree.ElementTree as ET
 import numpy as np
 from scipy import stats
+from scipy.stats import expon
+
+class Accuracy_Calc:
 
 
-def main():
+    def __init__(self, xml_path, output_filename):
 
-    # Path of xml.
-    xml_path = "/home/osteinnes/prog/tfserving-client/output/example_output.xml"
+        # Path of xml.
+        # xml_path = "/home/osteinnes/prog/tfserving-client/output/example_output.xml"
 
-    list_with_all_label_cracks, list_with_all_pred_cracks, list_with_iou, list_with_certainty, list_with_pred_class, list_with_actu_class = read_iou_xml(
-        xml_path)
+        list_with_all_label_cracks, list_with_all_pred_cracks, list_with_iou, list_with_certainty, list_with_pred_class, list_with_actu_class = self.read_iou_xml(
+            xml_path)
 
-    # Print output as test.
-    #print(list_with_all_label_cracks)
-    #print(list_with_all_pred_cracks)
-    #print(list_with_iou)
-    #print(list_with_certainty)
-    #print(list_with_actu_class)
-    #print(list_with_pred_class)
+        output_file = open(output_filename, "w+")
 
-    total_pred_cracks = sum(list_with_all_pred_cracks)
-    total_actu_cracks = sum(list_with_all_label_cracks)
+        total_pred_cracks = sum(list_with_all_pred_cracks)
+        total_actu_cracks = sum(list_with_all_label_cracks)
 
-    print()
-    print("Total number of predicted cracks: ", total_pred_cracks)
-    print("Total number of labeled cracks: ", total_actu_cracks)
+        total_missed_cracks = total_actu_cracks - total_pred_cracks
 
-    averages = sum(list_with_iou, 0.0) / len(list_with_iou)
+        if total_missed_cracks > 0:
+            for i in range(total_missed_cracks):
+                list_with_iou.append(0)
 
-    mean = np.mean(list_with_iou)
+        output_file.write("ACCURACY OF OBJECT DETECTION MODEL \n")
+        output_file.write("----------------------------------------------------------\n")
+        output_file.write("Path of XML: " + xml_path + "\n")
+        output_file.write("----------------------------------------------------------\n")
+        output_file.write("Total number of predicted crakcs: " + str(total_pred_cracks) + "\n")
+        output_file.write("Total number of labeled cracks: " + str(total_actu_cracks) + "\n")
+        output_file.write("Total number of missed cracks: " + str(total_missed_cracks) + "\n")
+        output_file.write("----------------------------------------------------------\n")
 
-    describe = stats.describe(list_with_iou)
+        describe = stats.describe(list_with_iou)
+        nobs, minmax, mean, variance, skewness, kurtosis = describe
 
-    print()
-    print("Average of IOU: ", averages)
-    print("Mean of IOU: ", mean)
-    print(describe)
+        output_file.write("See scipy.describe for documentation\n")
+        output_file.write("----------------------------------------------------------\n")
+        output_file.write("Nobs: " + str(nobs) + "\n")
+        output_file.write("MinMax: " + str(minmax) + "\n")
+        output_file.write("Mean: " + str(mean) + "\n")
+        output_file.write("Variance: " + str(variance) + "\n")
+        output_file.write("Skewness: " + str(skewness) + "\n")
+        output_file.write("Kurtosis: " + str(kurtosis) + "\n")
+        
 
 
-    
+    def read_iou_xml(self, xml_file: str):
 
+        # Retrieve XML-file with element tree
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
 
-def read_iou_xml(xml_file: str):
+        # Initiate empty vectors
+        list_with_all_label_cracks = []
+        list_with_all_pred_cracks = []
+        list_with_iou = []
+        list_with_certainty = []
+        list_with_pred_class = []
+        list_with_actu_class = []
 
-    # Retrieve XML-file with element tree
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
+        # Iterate through each object in the Pascal VOC xml.
+        for images in root.iter('object'):
 
-    # Initiate empty vectors
-    list_with_all_label_cracks = []
-    list_with_all_pred_cracks = []
-    list_with_iou = []
-    list_with_certainty = []
-    list_with_pred_class = []
-    list_with_actu_class = []
+            # Retrieve filename
+            filename = images.find('filename').text
 
-    # Iterate through each object in the Pascal VOC xml.
-    for images in root.iter('object'):
+            # Define None values.
+            iou = None
+            certainty = None
+            pred_class = None
+            actu_class = None
+            num_label_cracks = None
+            num_pred_cracks = None
 
-        # Retrieve filename
-        filename = images.find('filename').text
+            # Class name of the label in labels.
+            num_label_cracks = int(images.find("data").find("num_label_cracks").text)
+            num_pred_cracks = int(images.find("data").find("num_pred_cracks").text)
 
-        # Define None values.
-        iou = None
-        certainty = None
-        pred_class = None
-        actu_class = None
-        num_label_cracks = None
-        num_pred_cracks = None
+            # List of label names.
+            list_with_all_label_cracks.append(num_label_cracks)
+            list_with_all_pred_cracks.append(num_pred_cracks)
 
-        # Class name of the label in labels.
-        num_label_cracks = int(images.find("data").find("num_label_cracks").text)
-        num_pred_cracks = int(images.find("data").find("num_pred_cracks").text)
+            # Iterate through bndbox to find limits of box.
+            for crack in images.find("data").findall("crack"):
+                iou = float(crack.find("iou").text)
+                certainty = float(crack.find("certainty").text)
+                pred_class = str(crack.find("pred_class").text)
+                actu_class = str(crack.find("actu_class").text)
 
-        # List of label names.
-        list_with_all_label_cracks.append(num_label_cracks)
-        list_with_all_pred_cracks.append(num_pred_cracks)
+                list_with_iou.append(iou)
+                list_with_certainty.append(certainty)
+                list_with_pred_class.append(pred_class)
+                list_with_actu_class.append(actu_class)
 
-        # Iterate through bndbox to find limits of box.
-        for crack in images.find("data").findall("crack"):
-            iou = float(crack.find("iou").text)
-            certainty = float(crack.find("certainty").text)
-            pred_class = str(crack.find("pred_class").text)
-            actu_class = str(crack.find("actu_class").text)
-
-            list_with_iou.append(iou)
-            list_with_certainty.append(certainty)
-            list_with_pred_class.append(pred_class)
-            list_with_actu_class.append(actu_class)
-
-    return list_with_all_label_cracks, list_with_all_pred_cracks, list_with_iou, list_with_certainty, list_with_pred_class, list_with_actu_class
+        return list_with_all_label_cracks, list_with_all_pred_cracks, list_with_iou, list_with_certainty, list_with_pred_class, list_with_actu_class
 
 
 if __name__ == '__main__':
-    main()
+    Accuracy_Calc("/home/osteinnes/prog/tfserving-client/output/example_output.xml", "output/train_output_acc.txt")
