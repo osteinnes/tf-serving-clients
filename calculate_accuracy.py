@@ -79,35 +79,35 @@ class Accuracy_Calc:
 
         return list_with_all_label_cracks, list_with_all_pred_cracks, list_with_iou, list_with_certainty, list_with_pred_class, list_with_actu_class
 
-        def write_output_file(self, output_filename, xml_path, total_pred_cracks, total_actu_cracks, total_missed_cracks, nobs, minmax, mean, variance, skewness, kurtosis):
-            
-            # Create file for output.
-            output_file = open(output_filename, "w+")
-            
-            output_file.write("ACCURACY OF OBJECT DETECTION MODEL \n")
-            output_file.write(
-                "----------------------------------------------------------\n")
-            output_file.write("Path of XML: " + xml_path + "\n")
-            output_file.write(
-                "----------------------------------------------------------\n")
-            output_file.write(
-                "Total number of predicted crakcs: " + str(total_pred_cracks) + "\n")
-            output_file.write(
-                "Total number of labeled cracks: " + str(total_actu_cracks) + "\n")
-            output_file.write("Total number of missed cracks: " +
-                              str(total_missed_cracks) + "\n")
-            output_file.write(
-                "----------------------------------------------------------\n")
+    def write_output_file(self, output_filename, xml_path, total_pred_cracks, total_actu_cracks, total_missed_cracks, nobs, minmax, mean, variance, skewness, kurtosis):
+        
+        # Create file for output.
+        output_file = open(output_filename, "w+")
+        
+        output_file.write("ACCURACY OF OBJECT DETECTION MODEL \n")
+        output_file.write(
+            "----------------------------------------------------------\n")
+        output_file.write("Path of XML: " + xml_path + "\n")
+        output_file.write(
+            "----------------------------------------------------------\n")
+        output_file.write(
+            "Total number of predicted crakcs: " + str(total_pred_cracks) + "\n")
+        output_file.write(
+            "Total number of labeled cracks: " + str(total_actu_cracks) + "\n")
+        output_file.write("Total number of missed cracks: " +
+                            str(total_missed_cracks) + "\n")
+        output_file.write(
+            "----------------------------------------------------------\n")
 
-            output_file.write("See scipy.describe for documentation\n")
-            output_file.write(
-                "----------------------------------------------------------\n")
-            output_file.write("Nobs: " + str(nobs) + "\n")
-            output_file.write("MinMax: " + str(minmax) + "\n")
-            output_file.write("Mean: " + str(mean) + "\n")
-            output_file.write("Variance: " + str(variance) + "\n")
-            output_file.write("Skewness: " + str(skewness) + "\n")
-            output_file.write("Kurtosis: " + str(kurtosis) + "\n")
+        output_file.write("See scipy.describe for documentation\n")
+        output_file.write(
+            "----------------------------------------------------------\n")
+        output_file.write("Nobs: " + str(nobs) + "\n")
+        output_file.write("MinMax: " + str(minmax) + "\n")
+        output_file.write("Mean: " + str(mean) + "\n")
+        output_file.write("Variance: " + str(variance) + "\n")
+        output_file.write("Skewness: " + str(skewness) + "\n")
+        output_file.write("Kurtosis: " + str(kurtosis) + "\n")
 
 
 if __name__ == '__main__':
