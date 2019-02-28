@@ -1,0 +1,16 @@
+ACCURACY OF OBJECT DETECTION MODEL 
+----------------------------------------------------------
+Path of XML: /home/osteinnes/prog/tfserving-client/output/validation_acc_output.xml
+----------------------------------------------------------
+Total number of predicted crakcs: 1462
+Total number of labeled cracks: 1559
+Total number of missed cracks: 97
+----------------------------------------------------------
+See scipy.describe for documentation
+----------------------------------------------------------
+Nobs: 1559
+MinMax: (0.0, 0.9703332003611245)
+Mean: 0.30545693911317806
+Variance: 0.12148340919208098
+Skewness: 0.4151424354593608
+Kurtosis: -1.5633930110906498

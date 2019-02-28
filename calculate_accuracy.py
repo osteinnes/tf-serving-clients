@@ -111,5 +111,5 @@ class Accuracy_Calc:
 
 
 if __name__ == '__main__':
-    Accuracy_Calc("/home/osteinnes/prog/tfserving-client/output/example_output.xml",
-                  "output/train_output_acc.txt")
+    Accuracy_Calc("/home/osteinnes/prog/tfserving-client/output/validation_acc_output_01iou_075pred.xml",
+                  "output/validation_output_acc_01iou_075pred.txt")

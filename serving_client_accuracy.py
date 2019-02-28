@@ -171,7 +171,7 @@ def main():
                         pred, annotation_boxes[k])
 
                     # Checks if IOU is above 40%
-                    if iou_prelim > 0.4:
+                    if iou_prelim > 0.1:
                         print(iou_prelim)
 
                         actu_class = annotation_names[k]
@@ -207,7 +207,7 @@ def main():
                          num_pred_boxes,
                          cracks)
 
-    writer.save("/home/osteinnes/prog/tfserving-client/output/validation_acc_output.xml")
+    writer.save("/home/osteinnes/prog/tfserving-client/output/validation_acc_output_01iou_05pred.xml")
 
 
 def read_pascal_voc(xml_file: str):
